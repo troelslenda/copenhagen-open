@@ -17,6 +17,10 @@ Use it to make something cool, have fun, and share what you've learned with othe
 
 @import url('../twentyfifteen/style.css');
 
+body {
+  background-size: cover;
+}
+
 
 .hentry {
   background-color: rgba(255, 255, 255, .8) !important;
