@@ -114,8 +114,16 @@ function match_data_func( $atts ){
       return d($match_data);
     case 'name':
       return $match_data['data']['name'];
-    case 'regstart':
-      return $match_data['data']['registration_starts'];
+    case 'ssi_reg_start':
+      $date = new DateTime($match_data['data']['registration_starts']);
+      return date_i18n(
+        get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
+        $date->getTimestamp());
+    case 'ssi_match_start':
+      $date = new DateTime($match_data['data']['starts']);
+      return date_i18n(
+        get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
+        $date->getTimestamp());
     case 'competitor_list':
       return ipsc_match_competitorlist($match_data['competitors']);
     default:
