@@ -32,3 +32,11 @@ body {
     background-color: rgba(85, 195, 220, .8) !important;
   }
 }
+
+/* Smaller logo on mobile devices */
+@media screen and (min-width: 38.75em) {
+  .site-branding img {
+    margin: -20px 0;
+    width: 120px;
+  }
+}
