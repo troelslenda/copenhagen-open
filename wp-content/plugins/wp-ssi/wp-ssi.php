@@ -49,7 +49,8 @@ class ssi_widget extends WP_Widget {
       echo $args['before_title'] . $title . $args['after_title'];
 
 // This is where you run the code and display the output
-    echo __($api_data['data']['name'], 'ssi_widget_domain');
+    echo '<p>' . do_shortcode(__('Match Name: [match prop=ssi_name]', 'ssi_widget_domain')). '</p>';
+    echo '<p>' . do_shortcode(__('Match data was updated: [match prop=ssi_last_update]', 'ssi_widget_domain')). '</p>';
 
 
     echo $args['after_widget'];
@@ -110,20 +111,16 @@ function match_data_func( $atts ){
   $match_data = get_option('match_data');
 
   switch ($atts['prop']) {
-    case 'all':
-      return d($match_data);
-    case 'name':
+    case 'ssi_name':
       return $match_data['data']['name'];
     case 'ssi_reg_start':
-      $date = new DateTime($match_data['data']['registration_starts']);
-      return date_i18n(
-        get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
-        $date->getTimestamp());
+      return ssi_get_date_time(new DateTime($match_data['data']['registration_starts']));
     case 'ssi_match_start':
-      $date = new DateTime($match_data['data']['starts']);
-      return date_i18n(
-        get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
-        $date->getTimestamp());
+      return ssi_get_date_time(new DateTime($match_data['data']['starts']));
+    case 'ssi_match_ends':
+      return ssi_get_date_time(new DateTime($match_data['data']['ends']));
+    case 'ssi_last_update':
+      return ssi_get_date_time($match_data['fetched_from_api']);
     case 'competitor_list':
       return ipsc_match_competitorlist($match_data['competitors']);
     default:
@@ -136,6 +133,11 @@ add_shortcode('match', 'match_data_func');
 
 
 
+function ssi_get_date_time($datetime){
+  return date_i18n(
+    get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
+    $datetime->getTimestamp());
+}
 
 function ipsc_match_competitorlist($competitors) {
   //$list = new Competitor_List_Table();
