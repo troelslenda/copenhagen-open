@@ -44,23 +44,28 @@ function match_data_func( $atts ){
   if (empty(get_option('match_data'))) return;
 
   $match_data = get_option('match_data');
-
+  $prop = substr($atts['prop'], 4);
   switch ($atts['prop']) {
-    case 'ssi_name':
-      return $match_data['data']['name'];
-    case 'ssi_reg_start':
-      return ssi_get_date_time(new DateTime($match_data['data']['registration_starts']));
-    case 'ssi_match_start':
-      return ssi_get_date_time(new DateTime($match_data['data']['starts']));
-    case 'ssi_match_ends':
-      return ssi_get_date_time(new DateTime($match_data['data']['ends']));
+    case 'ssi_registration_starts':
+    case 'ssi_starts':
+    case 'ssi_ends':
+      return ssi_get_date_time(new DateTime($match_data['data'][$prop]));
     case 'ssi_last_update':
       return ssi_get_date_time($match_data['fetched_from_api']);
+    // Treat 0 as not set.
+    case 'ssi_number_of_stages':
+    case 'ssi_minimum_rounds':
+      if ($match_data['data'][$prop] <= 0) {
+        return 'TBA';
+      }
+      else {
+        return $match_data['data'][$prop];
+      }
     case 'competitor_list':
       return ipsc_match_competitorlist($match_data['competitors']);
     default:
       // Try to get property directly.
-      return $match_data['data'][$atts['prop']];
+      return $match_data['data'][$prop];
 
   }
 }
