@@ -49,9 +49,9 @@ function match_data_func( $atts ){
     case 'ssi_registration_starts':
     case 'ssi_starts':
     case 'ssi_ends':
-      return ssi_get_date_time(new DateTime($match_data['data'][$prop]));
+      return ssi_get_date_time(new DateTime($match_data['data'][$prop]), $atts);
     case 'ssi_last_update':
-      return ssi_get_date_time($match_data['fetched_from_api']);
+      return ssi_get_date_time($match_data['fetched_from_api'], $atts);
     // Treat 0 as not set.
     case 'ssi_number_of_stages':
     case 'ssi_minimum_rounds':
@@ -73,10 +73,14 @@ add_shortcode('match', 'match_data_func');
 
 
 
-function ssi_get_date_time($datetime){
-  return date_i18n(
-    get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
-    $datetime->getTimestamp());
+function ssi_get_date_time($datetime, $attributes = NULL){
+  if (isset($attributes['format']) && $attributes['format'] == 'date_only') {
+    $format = get_option( 'date_format' );
+  }
+  else {
+    $format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+  }
+  return date_i18n($format, $datetime->getTimestamp());
 }
 
 function ipsc_match_competitorlist($competitors) {
