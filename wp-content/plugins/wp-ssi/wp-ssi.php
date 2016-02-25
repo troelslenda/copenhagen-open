@@ -91,14 +91,15 @@ function ipsc_match_competitorlist($competitors) {
 }
 
 register_activation_hook( __FILE__, function(){
-  wp_schedule_event( time(), '5min', 'ssi_fetch_api_data' );
+  wp_schedule_event( time(), '5min', 'shootnscoreit' );
 });
 register_deactivation_hook(__FILE__, function(){
-  wp_clear_scheduled_hook('ssi_fetch_api_data');
+  wp_clear_scheduled_hook('shootnscoreit');
 });
 
 
 
+add_action('shootnscoreit', 'ssi_fetch_api_data');
 
 
 function my_cron_schedules($schedules){
