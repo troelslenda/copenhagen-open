@@ -90,15 +90,36 @@ function ipsc_match_competitorlist($competitors) {
   var_dump($competitors);
 }
 
+register_activation_hook( __FILE__, function(){
+  wp_schedule_event( time(), '5min', 'ssi_fetch_api_data' );
+});
+register_deactivation_hook(__FILE__, function(){
+  wp_clear_scheduled_hook('ssi_fetch_api_data');
+});
 
 
-/*
- * Implement some sort of CRON to update match_data option.
- */
-$match_key = get_option('ssi_match_id');
 
-if (get_option('match_data')['data']['pk'] != $match_key) {
 
+
+function my_cron_schedules($schedules){
+  if(!isset($schedules["5min"])){
+    $schedules["5min"] = array(
+      'interval' => 5*60,
+      'display' => __('Once every 5 minutes'));
+  }
+  if(!isset($schedules["30min"])){
+    $schedules["30min"] = array(
+      'interval' => 30*60,
+      'display' => __('Once every 30 minutes'));
+  }
+  return $schedules;
+}
+add_filter('cron_schedules','my_cron_schedules');
+
+
+
+function ssi_fetch_api_data() {
+  $match_key = get_option('ssi_match_id');
   $parts = array(
     'data' => '',
     'competitors' => 'competitors',
@@ -118,6 +139,14 @@ if (get_option('match_data')['data']['pk'] != $match_key) {
 
   $api_data['fetched_from_api'] = new DateTime();
   update_option('match_data', $api_data);
+}
+
+
+/*
+ * Implement some sort of CRON to update match_data option.
+ */
+if (get_option('match_data')['data']['pk'] != get_option('ssi_match_id')) {
+  ssi_fetch_api_data();
 }
 
 
