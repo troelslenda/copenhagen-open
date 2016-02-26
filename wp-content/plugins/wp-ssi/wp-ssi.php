@@ -61,8 +61,8 @@ function match_data_func( $atts ){
       else {
         return $match_data['data'][$prop];
       }
-    case 'competitor_list':
-      return ipsc_match_competitorlist($match_data['competitors']);
+    case 'ssi_competitor_list':
+      return ipsc_match_competitorlist($match_data);
     default:
       // Try to get property directly.
       return $match_data['data'][$prop];
@@ -83,11 +83,83 @@ function ssi_get_date_time($datetime, $attributes = NULL){
   return date_i18n($format, $datetime->getTimestamp());
 }
 
-function ipsc_match_competitorlist($competitors) {
-  //$list = new Competitor_List_Table();
-  return 'fisk';
+function ipsc_match_competitorlist($match_data) {
 
-  var_dump($competitors);
+  $competitors = $match_data['competitors'];
+  $headers = array(
+    array('data'=> __(''), 'class' => 'flag'),
+    __('Name'),
+    array('data'=> __('Squad'), 'class' => 'squad'),
+    array('data'=> __('Call'), 'class' => 'call'),
+  );
+  foreach($competitors as $competitor) {
+    if ($competitor['prematch']){
+
+      $rows[] = array(
+        array(
+          'data' => '<img src="/wp-content/themes/twentyfifteen-child/img/' . get_region($competitor['region']) . '.png" />',
+          'class' => 'flag',
+        ),
+
+        $competitor['first_name'] . ' ' . $competitor['last_name'] . '<p>' . $competitor['club'] . '</p>',
+        get_squad_by_pk($competitor['squad']),
+
+        array(
+          'data' => '<a href="tel://' . $competitor['get_phone_display'] . '">' . __('Call') . '</a>',
+          'class' => 'call',
+        ),
+
+      );
+    }
+  }
+  return render_table($headers, $rows, 'prematch_table');
+}
+
+function get_squad_by_pk($pk) {
+  $match_data = get_option('match_data');
+
+  foreach ($match_data['squads'] as $squad) {
+    if ($squad['pk'] == $pk) {
+      return $squad['number'];
+    }
+  }
+
+}
+
+function get_region($region) {
+  $regions = array(
+    'dnk' => 'danish',
+    'swe' => 'swedish'
+  );
+  return $regions[strtolower($region)];
+}
+function render_table($headers, $rows, $class="table"){
+
+  foreach ($headers as $header) {
+    if (is_array($header)){
+      $table_headers[] = '<th class="' . $header['class'] . '">' . $header['data'] . '</th>';
+    }
+    else {
+      $table_headers[] = '<th>' . $header . '</th>';
+    }
+
+  }
+  $table_rows[] = '<thead>' . implode($table_headers) . '</thead>';
+
+  foreach ($rows as $row) {
+    $columns = array();
+    foreach ($row as $field) {
+      if (is_array($field)){
+        $columns[] = '<td class="' . $field['class'] . '">' . $field['data'] . '</td>';
+      }
+      else {
+        $columns[] = '<td>' . $field . '</td>';
+      }
+    }
+    $table_rows[] = '<tr>' . implode($columns) . '</tr>';
+  }
+
+  return '<table class="' . $class . '">' . implode($table_rows) . '</table>';
 }
 
 register_activation_hook( __FILE__, function(){

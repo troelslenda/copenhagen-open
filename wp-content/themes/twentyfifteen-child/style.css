@@ -53,3 +53,19 @@ body {
     width: auto;
   }
 }
+
+.prematch_table p {
+  margin: 0;
+  font-size: 10px;
+  color: #646464;
+}
+
+.prematch_table .squad {
+  width: 70px;
+}
+.prematch_table .call {
+  width: 70px;
+}
+.prematch_table .flag{
+  width: 37px;
+}
