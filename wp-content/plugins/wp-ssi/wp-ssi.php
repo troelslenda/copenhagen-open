@@ -140,7 +140,6 @@ function ssi_fetch_api_data() {
 
   $api_data['fetched_from_api'] = new DateTime();
   update_option('match_data', $api_data);
-  mail("troelslenda@gmail.com","cronjob",'cronjob ran. tstamp for apidata: ' + $api_data['fetched_from_api']->format('H:i'));
 }
 
 
