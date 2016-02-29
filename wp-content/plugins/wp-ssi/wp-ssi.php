@@ -203,7 +203,10 @@ function get_squad_by_pk($pk) {
 function get_region($region) {
   $regions = array(
     'dnk' => 'danish',
-    'swe' => 'swedish'
+    'swe' => 'swedish',
+    'nor' => 'norway',
+    'fin' => 'finland'
+
   );
   return $regions[strtolower($region)];
 }
