@@ -77,12 +77,29 @@ function match_data_func( $atts ){
 }
 add_shortcode('match', 'match_data_func');
 
+/**
+ * Returns calculated data.
+ *
+ * @return string
+ */
+function math_data_func( $atts, $content ){
+  $str = 'return ' . strip_tags(do_shortcode($content)) . ';';
+  return eval($str);
+}
+add_shortcode('math', 'math_data_func');
 
 function ssi_competitor_count_prop($match_data, $atts) {
   $prop = 0;
   $value = next($atts);
   $key = next(array_keys($atts));
   foreach($match_data['competitors'] as $competitor) {
+    // Skip deleted users.
+    if (strtolower($competitor['status']) == 'x') {
+      continue;
+    }
+    if (strtolower($value) == 'false') {
+      $value = false;
+    }
     if ($competitor[$key] == $value) {
       $prop++;
     }
