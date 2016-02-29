@@ -63,6 +63,12 @@ function match_data_func( $atts ){
       }
     case 'ssi_competitor_list':
       return ipsc_match_competitorlist($match_data);
+    case 'ssi_competitors_by_country':
+      return ipsc_match_competitor_by_country($match_data);
+    case 'ssi_competitors_by_team':
+      return ipsc_match_competitor_by_team($match_data);
+    case 'ssi_competitor_count_prop':
+      return ssi_competitor_count_prop($match_data, $atts);
     default:
       // Try to get property directly.
       return $match_data['data'][$prop];
@@ -71,6 +77,46 @@ function match_data_func( $atts ){
 }
 add_shortcode('match', 'match_data_func');
 
+
+function ssi_competitor_count_prop($match_data, $atts) {
+  $prop = 0;
+  $value = next($atts);
+  $key = next(array_keys($atts));
+  foreach($match_data['competitors'] as $competitor) {
+    if ($competitor[$key] == $value) {
+      $prop++;
+    }
+  }
+  return $prop;
+}
+
+
+function ipsc_match_competitor_by_country($match_data) {
+  $competitors = $match_data['competitors'];
+  $headers = array(
+    array('data'=> __('Region'), 'class' => 'flag'),
+    array('data'=> __('Competitors'), 'class' => 'call'),
+  );
+  $regions = array();
+
+  foreach($competitors as $competitor) {
+    $regions[$competitor['region']]++;
+  }
+
+  foreach ($regions as $region => $count) {
+    $rows[] = array(
+      array(
+        'data' => '<img src="/wp-content/themes/twentyfifteen-child/img/' . get_region($region) . '.png" />',
+        'class' => 'flag',
+      ),
+      array(
+        'data' => $count,
+        'class' => 'call',
+      ),
+    );
+  }
+  return render_table($headers, $rows, 'prematch_table');
+}
 
 
 function ssi_get_date_time($datetime, $attributes = NULL){
@@ -199,6 +245,7 @@ function ssi_fetch_api_data() {
     'squads' => 'squads',
     'stats' => 'stats',
     'stages' => 'stages',
+    'teams' => 'teams',
   );
 
   foreach ($parts as $entry => $url_part) {
