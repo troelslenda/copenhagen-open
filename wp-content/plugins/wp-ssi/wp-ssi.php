@@ -62,7 +62,7 @@ function match_data_func( $atts ){
         return $match_data['data'][$prop];
       }
     case 'ssi_competitor_list':
-      return ipsc_match_competitorlist($match_data);
+      return ipsc_match_competitorlist($match_data, $atts);
     case 'ssi_competitors_by_country':
       return ipsc_match_competitor_by_country($match_data);
     case 'ssi_competitors_by_team':
@@ -146,34 +146,45 @@ function ssi_get_date_time($datetime, $attributes = NULL){
   return date_i18n($format, $datetime->getTimestamp());
 }
 
-function ipsc_match_competitorlist($match_data) {
+function ipsc_match_competitorlist($match_data, $atts) {
 
   $competitors = $match_data['competitors'];
   $headers = array(
     array('data'=> __(''), 'class' => 'flag'),
     __('Name'),
-    array('data'=> __('Squad'), 'class' => 'squad'),
-    array('data'=> __('Call'), 'class' => 'call'),
+    //array('data'=> __('Squad'), 'class' => 'squad'),
+    //array('data'=> __('Call'), 'class' => 'call'),
   );
+
+  // Remove first attribute.
+  $atts = array_reverse($atts);
+  array_pop($atts);
   foreach($competitors as $competitor) {
-    if ($competitor['prematch']){
 
-      $rows[] = array(
-        array(
-          'data' => '<img src="/wp-content/themes/twentyfifteen-child/img/' . get_region($competitor['region']) . '.png" />',
-          'class' => 'flag',
-        ),
-
-        $competitor['first_name'] . ' ' . $competitor['last_name'] . '<p>' . $competitor['club'] . '</p>',
-        get_squad_by_pk($competitor['squad']),
-
-        array(
-          'data' => '<a href="tel://' . $competitor['get_phone_display'] . '">' . __('Call') . '</a>',
-          'class' => 'call',
-        ),
-
-      );
+    if (!empty($atts)) {
+      foreach($atts as $key => $value) {
+        if($competitor[$key] != $value){
+          continue 2;
+        }
+      }
     }
+
+    $rows[] = array(
+      array(
+        'data' => '<img src="/wp-content/themes/twentyfifteen-child/img/' . get_region($competitor['region']) . '.png" />',
+        'class' => 'flag',
+      ),
+
+      $competitor['first_name'] . ' ' . $competitor['last_name'] . '<p>' . $competitor['club'] . '</p>',
+      //get_squad_by_pk($competitor['squad']),
+
+      /*array(
+        'data' => '<a href="tel://' . $competitor['get_phone_display'] . '">' . __('Phone') . '</a>',
+        'class' => 'call',
+      ),*/
+
+    );
+
   }
   return render_table($headers, $rows, 'prematch_table');
 }
